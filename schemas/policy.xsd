@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (http://www.altova.com) by Dan Thomas (DC Department of Human Services DCAS Project) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified">
+	<xs:include schemaLocation="common.xsd"/>
+	<xs:include schemaLocation="individual.xsd"/>
+	<xs:include schemaLocation="employer.xsd"/>
+	<xs:include schemaLocation="organization.xsd"/>
+	<xs:include schemaLocation="plan.xsd"/>
+	<xs:complexType name="PolicyType">
+		<xs:sequence>
+			<xs:element name="enrollees">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="enrollee" type="EnrolleeType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:group ref="HbxIdentifierGroup"/>
+			<xs:element name="broker" type="BrokerType" minOccurs="0"/>
+			<xs:element name="premium_amount_total"/>
+			<xs:element name="total_responsible_amount" type="CurrencyType"/>
+			<xs:element name="total_employer_responsible_amount" type="CurrencyType" minOccurs="0"/>
+			<xs:element name="carrier_to_bill" type="xs:boolean"/>
+			<xs:element name="plan" type="PlanReferenceType"/>
+			<xs:choice>
+				<xs:element name="shop_policy">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="employer" type="EmployerIndexType"/>
+							<xs:element name="total_employer_responsible_amount" type="CurrencyType"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="individual_policy">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="carrier_to_bill" type="xs:boolean"/>
+							<xs:element name="allocated_aptc" type="CurrencyType"/>
+							<xs:element name="elected_aptc_percent" type="xs:float"/>
+							<xs:element name="applied_aptc" type="CurrencyType"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="request_submit_timestamp" type="SimpleDateType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PolicyRequestType"/>
+	<xs:simpleType name="PolicyRequestNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:requests:v1:policies"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:policies#by_id"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:policies#create"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:policies#update"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:policies#delete"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:policies#terminate"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:policies#change_state"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PolicyEventType">
+		<xs:annotation>
+			<xs:documentation>Message structure for Policy event</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="EventType">
+				<xs:sequence>
+					<xs:element name="hbx_id" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="event_name">
+						<xs:annotation>
+							<xs:documentation>URN for this event, e.g.; urn:openhbx:events:v1:individual#created</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="policy_uri"/>
+					<xs:element name="authorization">
+						<xs:annotation>
+							<xs:documentation>Authentication/authorization credentials</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sender_uri" type="xs:anyURI">
+						<xs:annotation>
+							<xs:documentation>URN for service or source that raised event</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="submitted_timestamp" type="xs:dateTime">
+						<xs:annotation>
+							<xs:documentation>UTC date and time when event occured</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="PolicyEventNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:events:v1:policies#created"/>
+			<xs:enumeration value="urn:openhbx:events:v1:policies#updated"/>
+			<xs:enumeration value="urn:openhbx:events:v1:policies#deleted"/>
+			<xs:enumeration value="urn:openhbx:events:v1:policies#state_changed"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PolicyResponseType">
+		<xs:complexContent>
+			<xs:restriction base="RequestResponseType">
+				<xs:sequence>
+					<xs:element name="header" type="ResponseHeaderType"/>
+					<xs:element name="metadata" type="MetadataType" minOccurs="0"/>
+					<xs:element name="results">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element ref="policy" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EnrolleeType">
+		<xs:sequence>
+			<xs:element name="individual" type="IndividualIndexType"/>
+			<xs:element name="relationship" type="RelationshipType"/>
+			<xs:element name="premium_amount" type="CurrencyType"/>
+			<xs:element name="coverage_status" type="xs:string"/>
+			<xs:element name="benefit_status" type="BenefitStatusType" minOccurs="0"/>
+			<xs:element name="coverage_start_date" type="SimpleDateType"/>
+			<xs:element name="coverage_end_date" type="CurrencyType"/>
+			<xs:element name="disabled" type="xs:boolean"/>
+			<xs:element ref="employment_status"/>
+			<xs:element name="carrier_assigned_member_id" type="xs:string"/>
+			<xs:element name="carrier_assigned_policy_id" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="policy"/>
+	<xs:element name="policy_uri" type="xs:anyURI" substitutionGroup="resource_instance_uri">
+		<xs:annotation>
+			<xs:documentation>Dereferenceable identifier for employer instance, e.g. http://dchealthlink.com/api/services/employer/_id</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

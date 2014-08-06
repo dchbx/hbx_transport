@@ -1,0 +1,851 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (http://www.altova.com) by Dan Thomas (DC Department of Human Services DCAS Project) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" xmlns:altova="http://www.altova.com/xml-schema-extensions" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified" version="1.0">
+	<xs:complexType name="PersonType">
+		<xs:annotation>
+			<xs:documentation>Name and contact information for an individual</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="NameType"/>
+			<xs:element name="job_title" type="xs:string" minOccurs="0"/>
+			<xs:element name="department" type="xs:string" minOccurs="0"/>
+			<xs:element name="addresses" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="address" type="AddressType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="emails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="email" type="EmailType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="phones" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="phone" type="PhoneType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="authority_hbx_id" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonListType">
+		<xs:annotation>
+			<xs:documentation>Summary attributes for a person</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="NameType"/>
+			<xs:group ref="HbxIdentifierGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="NameType">
+		<xs:annotation>
+			<xs:documentation>Base type for components of an individual's name</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name_prefix" type="xs:string" minOccurs="0"/>
+			<xs:element name="name_first" type="xs:string"/>
+			<xs:element name="name_middle" type="xs:string" minOccurs="0"/>
+			<xs:element name="name_last" type="xs:string"/>
+			<xs:element name="name_suffix" type="xs:string" minOccurs="0"/>
+			<xs:element name="name_full" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AddressType">
+		<xs:annotation>
+			<xs:documentation>Physical street or mailing address</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="address_type">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:address_type#billing"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:address_type#home"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:address_type#work"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="address_1" type="xs:string"/>
+			<xs:element name="address_2" type="xs:string" minOccurs="0"/>
+			<xs:element name="city" type="xs:string"/>
+			<xs:element name="state" type="xs:string"/>
+			<xs:element name="postal_code" type="xs:string"/>
+			<xs:element name="country_code" type="xs:string" minOccurs="0"/>
+			<xs:element name="coordinates" type="PositionPointType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PhoneType">
+		<xs:annotation>
+			<xs:documentation>Telephone communication number and kind</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="phone_type">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#home"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#work"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#mobile"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#pager"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#main"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#extension"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#other"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="phone_number" type="TelephoneNumberType"/>
+			<xs:element name="extension" type="xs:string" minOccurs="0"/>
+			<xs:element name="preferred" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmailType">
+		<xs:annotation>
+			<xs:documentation>Email communication address and kind</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="email_type">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:email_type#home"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:email_type#work"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="email_address" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PositionPointType">
+		<xs:annotation>
+			<xs:documentation>Location cooordinate expressed as a GeoJSON Point.  See: http://www.geojson.org/geojson-spec.html#positions</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="x" type="xs:float"/>
+			<xs:element name="y" type="xs:float"/>
+			<xs:element name="z" type="xs:float" minOccurs="0"/>
+			<xs:element name="coordinate_system_reference" type="xs:anyURI" default=" urn:ogc:def:crs:EPSG::4326"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SimpleDateRangeType">
+		<xs:annotation>
+			<xs:documentation>Time period expressed in SimpleDateType format</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="start" type="SimpleDateType"/>
+			<xs:element name="end" type="SimpleDateType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="KeyValuePairType">
+		<xs:annotation>
+			<xs:documentation>Data structure that includes a label and associated attribute value</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="key" type="xs:string"/>
+			<xs:element name="value" type="xs:anyType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="HashType">
+		<xs:annotation>
+			<xs:documentation>An array of one or more KeyValueType pairs</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="key_value_pair" type="KeyValuePairType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:group name="HbxIdentifierGroup">
+		<xs:annotation>
+			<xs:documentation>Identifier pair for a single Exchange resource in both enterprise URI and local service form</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="hbx_assigned_uri" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Enterprise/globally unique identifier for this resource</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hbx_assigned_id" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="ServiceEndpointGroup">
+		<xs:annotation>
+			<xs:documentation>Identifier pair for a single Exchange resource in both enterprise URI and local service form</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="urn" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Unique reference for this service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uri" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Derefernceable URI for this service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="resource_instance_uri" type="xs:anyURI">
+		<xs:annotation>
+			<xs:documentation>Dereferenceable resource identifier</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="extended_resource_instance_uri" type="xs:anyURI">
+		<xs:annotation>
+			<xs:documentation>Optional, additional dereferenceable resource identifier(s)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="ServiceHeaderType">
+		<xs:annotation>
+			<xs:documentation>Base type of header component properties for SOA service call or response</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="hbx_id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="submitted_timestamp" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>UTC date and time when event occured</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="authorization" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Authentication/authorization credentials</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="ServiceStatusType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicate success or failure of a request to a service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="message_id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Value that uniqely identifies message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originating_service" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The urn of the requesting service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="reply_to" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Designates the consumer service urn endpoint where to transmit response</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="correlation_id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="application_header_properties" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Application-specific header key/value pairs</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceStatusType">
+		<xs:annotation>
+			<xs:documentation>Base type of status result properties for SOA service call </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="return_status">
+				<xs:annotation>
+					<xs:documentation>HTTP status code</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:enumeration value="200">
+							<xs:annotation>
+								<xs:documentation>OK</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="201">
+							<xs:annotation>
+								<xs:documentation>Created</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="304">
+							<xs:annotation>
+								<xs:documentation>Not modified</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="400">
+							<xs:annotation>
+								<xs:documentation>Bad request</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="401">
+							<xs:annotation>
+								<xs:documentation>Unauthorized due to authentication error</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="403">
+							<xs:annotation>
+								<xs:documentation>Unauthorized</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="404">
+							<xs:annotation>
+								<xs:documentation>Not found</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="500">
+							<xs:annotation>
+								<xs:documentation>Internal server error</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="error_code" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Error code relevant to local service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="developer_message" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Plain text description for app developer with hits about how to fix</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="user_message" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Message passed to the application. if needed</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="more_information" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Link with additional information about this error </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceMetadataType">
+		<xs:annotation>
+			<xs:documentation>Base type of descriptive data about the data returned in a service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="result_set" type="ServiceResultSetType"/>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Wildcard to support schema extension</xs:documentation>
+				</xs:annotation>
+			</xs:any>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceResultSetType">
+		<xs:annotation>
+			<xs:documentation>Base type of service result propoerties for SOA service call</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="count" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Total number of items in the result set</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="limit" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Number of items returned in this payload</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="offset" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Position in the result set of the first record in this payload</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceBodyType">
+		<xs:annotation>
+			<xs:documentation>Base type of body component properties for a SOA service call or response</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceEventType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base type to publish resource events to message systems</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="event_name" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Uniform Resource Name (URN) for this event, e.g.; urn:openhbx:events:v1:individual#added</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="qualifying_reason" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>URN for the regulatory or policy basis enabling this change </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="resource_instance_uri">
+				<xs:annotation>
+					<xs:documentation>URN for the resource instance that is subject of this event</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="extended_resource_instance_uri" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>URN(s) for other resource instances assocated with this event</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="body" type="ServiceBodyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceRequestType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base type to call a SOA service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="request_name" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Uniform Resource Name (URN) for this request e.g.; urn:openhbx:requests:v1:individual</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="parameters" type="xs:anyType" minOccurs="0"/>
+			<xs:element name="metadata" type="ServiceMetadataType" minOccurs="0"/>
+			<xs:element name="body" type="xs:anyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceResponseType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base type for response body.  If results might return more than one record (i.e. it's a set response type), you MUST provide metadata.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="header" type="ServiceHeaderType"/>
+			<xs:element name="metadata" type="ServiceMetadataType"/>
+			<xs:element name="body" type="xs:anyType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EnrollmentStatusType">
+		<xs:annotation>
+			<xs:documentation>An Application Group's enrollment status at a given period of time</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="event_id">
+				<xs:annotation>
+					<xs:documentation>Dereferenceable event identifier that triggered enrollment state</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="state">
+				<xs:annotation>
+					<xs:documentation>Status of enrollment</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:dc0:terms:enrollment_state#open"/>
+						<xs:enumeration value="urn:dc0:terms:enrollment_state#closed"/>
+						<xs:enumeration value="urn:dc0:terms:enrollment_state#special_enrollment_period"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="time_period">
+				<xs:annotation>
+					<xs:documentation>Enrollment state start and end dates</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceEndPointType">
+		<xs:annotation>
+			<xs:documentation>Attributes for registering and publishing a service on the system</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name for this service in free form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Release number associated with this service instance</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:group ref="ServiceEndpointGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="HbxIdNameType">
+		<xs:annotation>
+			<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+			<xs:appinfo>
+				<altova:exampleValues>
+					<altova:example value="urn:openhbx:terms:v1:hbx#dc0"/>
+				</altova:exampleValues>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:list itemType="xs:anyURI"/>
+	</xs:simpleType>
+	<xs:simpleType name="TelephoneNumberType">
+		<xs:annotation>
+			<xs:documentation>US Telephone number format. Matches: (999)999-9999, 9999999999, 999-999-9999</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="^\(\d{3}\) ?\d{3}( |-)?\d{4}|^\d{3}( |-)?\d{3}( |-)?\d{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SimpleDateType">
+		<xs:annotation>
+			<xs:documentation>A simple date format: CCYYMMDD, e.g. 20140601</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([1-9][0-9]{3})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FederalTaxIdType">
+		<xs:annotation>
+			<xs:documentation>IRS-assigned Identifier for an individual or organization. Matches: 01-1234567, 011234567, 123-45-6789</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9]{3}-[0-9]{2}-[0-9]{4})|([0-9]{9})|([0-9]{2}-[0-9]{7})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TaxFilerNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:tax_filer#single"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:tax_filer#joint"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:tax_filer#separate"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:tax_filer#dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:tax_filer#non-filer"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UsStateNameType">
+		<xs:annotation>
+			<xs:documentation>US state names</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Alabama"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Alaska"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Arizona"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Arkansas"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#California"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Colorado"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Connecticut"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Delaware"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#District Of Columbia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Florida"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Georgia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Hawaii"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Idaho"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Illinois"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Indiana"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Iowa"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Kansas"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Kentucky"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Louisiana"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Maine"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Maryland"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Massachusetts"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Michigan"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Minnesota"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Mississippi"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Missouri"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Montana"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Nebraska"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Nevada"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#New Hampshire"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#New Jersey"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#New Mexico"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#New York"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#North Carolina"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#North Dakota"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Ohio"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Oklahoma"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Oregon"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Pennsylvania"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Rhode Island"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#South Carolina"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#South Dakota"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Tennessee"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Texas"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Utah"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Vermont"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Virginia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Washington"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#West Virginia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Wisconsin"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_states#Wyoming"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CurrencyType">
+		<xs:annotation>
+			<xs:documentation>Monetary value. Positive and negative values are valid</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LanguageType">
+		<xs:annotation>
+			<xs:documentation>Language expressed in ISO 639-1 standard, e.g. en = English, es = Spanish</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="GenderNameType">
+		<xs:annotation>
+			<xs:documentation>Identification of an individual as masculine or feminine</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:dc0:terms:gender#male"/>
+			<xs:enumeration value="urn:dc0:terms:gender#female"/>
+			<xs:enumeration value="urn:dc0:terms:gender#unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EmploymentStatusNameType">
+		<xs:annotation>
+			<xs:documentation>State of activity in the labor force</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#active"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#full_time"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#part_time"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#terminated"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#leave_of_absence"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#retired"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EntityNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#case_manager"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#key_person"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#parent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#responsible_party"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#ex_spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#significant_other"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#legal_representative"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#power_of_attorney"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#other_insured"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BenefitStatusNameType">
+		<xs:annotation>
+			<xs:documentation>State of activity for an enrollment</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_status#active"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_status#cobra"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_status#surviing_insured"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_status#tefra"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MaritalStatusNameType">
+		<xs:annotation>
+			<xs:documentation>Matrimonial relationship state between two individuals</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#single"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#married"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#domestic_partners"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#separated"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#legally_seperated"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#divorced"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#widowed"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="InterpersonalRelationshipType">
+		<xs:annotation>
+			<xs:documentation>Interpersonal relationship state between two indiciduals</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="subject_individual" type="xs:anyURI"/>
+			<xs:element name="relationship_uri" type="xs:anyURI"/>
+			<xs:element name="inverse_relationship_uri" minOccurs="0" type="xs:anyURI"/>
+			<xs:element name="object_individual" type="xs:anyURI"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="relationship_uri" type="xs:anyURI" abstract="true"/>
+	<xs:element name="inverse_relationship_uri" type="xs:anyURI"/>
+	<xs:simpleType name="IndividualRelationshipNameType">
+		<xs:annotation>
+			<xs:documentation>Interpersonal relationship names between connected individuals</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#head of household"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#father"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#mother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#grandfather"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#grandmother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#grandson"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#granddaughter"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#uncle"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#aunt"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#nephew"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#niece"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#cousin"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#adopted child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#foster child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#son-in-law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#daughter-in-law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#brother-in-law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#sister-in-law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#father-in-law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#mother-in-law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#brother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#sister"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#ward"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#stepparent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#stepson"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#stepdaughter"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#sponsored dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#dependent of a minor dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#ex-spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#court appointed guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#collateral dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#life partner"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#female"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EnrolleeRelationshipNameType">
+		<xs:annotation>
+			<xs:documentation>Interpersonal relationship names between individuals in a plan enrollment</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#self"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#father"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#mother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#grandfather"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#grandmother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#grandson"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#granddaughter"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#uncle"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#aunt"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#nephew"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#niece"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#cousin"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#adopted_child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#foster_child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#son_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#daughter_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#brother_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#sister_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#father_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#mother_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#brother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#sister"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#ward"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#stepparent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#stepson"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#stepdaughter"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#sponsored_dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#dependent_of_a_minor_dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#ex_spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#court_appointed_guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#collateral_dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#life_partner"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#female"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QualifyingLifeEventNameType">
+		<xs:annotation>
+			<xs:documentation>Life events that trigger special enrollment periods</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#lost_access_to_mec"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#open_enrollment"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#adoption"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#placement_for_adoption"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#foster_care"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#birth"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#marriage"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#location_change"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#termination_of_benefits"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#employment_termination"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#citizenship_granted"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#enrollment_error_or_misconduct_hbx"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#enrollment_error_or_misconduct_carrier"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#enrollment_error_or_misconduct_non_hbx"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#contract_violation"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#eligibility_change"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#qualified_native_american"/>
+			<xs:enumeration value="urn:dc0:terms:v1:qualifying_life_event#exceptional_circumstances">
+				<xs:annotation>
+					<xs:documentation>Medicaid ineligible, SHOP didn't go through, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BenefitMaintenanceNameType">
+		<xs:annotation>
+			<xs:documentation>Event that causes change in benefit enrollment</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#initial_enrollment"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#benefit_selection"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#plan_change"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#identifying_info_change"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#termination_of_benefits"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#non_payment"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#employment_termination"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#marriage"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#location_change"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#adoption"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#birth"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#death"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#non_payment"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#legal_separation"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#surviving_spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#divorce"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_maintenance#retirement"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BenefitCoverageNameType">
+		<xs:annotation>
+			<xs:documentation>Kind of insurance </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_coverage#health"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:benefit_coverage#dental"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PlanMetalLevelNameType">
+		<xs:annotation>
+			<xs:documentation>ACA plan category designation</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#bronze"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#silver"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#gold"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#platinum"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#catastrophic"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HbxResourceNameType">
+		<xs:annotation>
+			<xs:documentation>Resources in OpenHBX services model</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#application_groups"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#individuals"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#employers"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#policies"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#carriers"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#plans"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#brokers"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EnrollmentStatusNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#application_intake"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#plan_shopping"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#application_submitted"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#maintenance_pending"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#maintenance_submitted"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
