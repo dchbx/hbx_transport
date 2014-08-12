@@ -4,11 +4,6 @@
 	<xs:include schemaLocation="common.xsd"/>
 	<xs:include schemaLocation="individual.xsd"/>
 	<xs:include schemaLocation="organization.xsd"/>
-	<xs:complexType name="EmployerBrokerType">
-		<xs:complexContent>
-			<xs:extension base="BrokerType"/>
-		</xs:complexContent>
-	</xs:complexType>
 	<xs:complexType name="EmployerPlanListType">
 		<xs:annotation>
 			<xs:documentation>SHOP employer-selected benefits model</xs:documentation>
@@ -19,7 +14,7 @@
 					<xs:documentation>Carrier-assigned text label for plan </xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="hbx_plan_id" type="xs:string">
+			<xs:element name="hbx_plan_id" type="IdentifierType">
 				<xs:annotation>
 					<xs:documentation>HBX-assigned plan identifier</xs:documentation>
 				</xs:annotation>
@@ -29,22 +24,12 @@
 					<xs:documentation>HIOS plan identifier component + subcomponent</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="employer_request_name" type="EmployerRequestNameType">
-				<xs:annotation>
-					<xs:documentation>Method call on the Employer resource</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="carrier_name" type="xs:string">
+			<xs:element name="issuer" type="IssuerLinkType">
 				<xs:annotation>
 					<xs:documentation>Text label for plan provider</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="carrier_urn" type="xs:anyURI">
-				<xs:annotation>
-					<xs:documentation>HBX-assigned carrier identifier</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="policy_number" minOccurs="0">
+			<xs:element name="policy_number" type="xs:string" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Carrier-assigned policy number</xs:documentation>
 				</xs:annotation>
@@ -76,6 +61,8 @@
 			<xs:documentation>SHOP employer instance attributes</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="hbx_id" type="IdentifierType"/>
 			<xs:element name="name" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Employer name in free-form text</xs:documentation>
@@ -83,23 +70,49 @@
 			</xs:element>
 			<xs:element name="dba" type="xs:string" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>Employer trade name (Doing Business As)</xs:documentation>
+					<xs:documentation>Doing Business As</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element ref="fein"/>
-			<xs:group ref="HbxIdentifierGroup"/>
 			<xs:element ref="sic_code" minOccurs="0"/>
 			<xs:element ref="fte_count"/>
 			<xs:element ref="pte_count"/>
-			<xs:element name="broker" type="EmployerBrokerType" minOccurs="0"/>
+			<xs:element name="broker" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="BrokerType">
+							<xs:sequence>
+								<xs:element name="id" type="IdentifierType"/>
+								<xs:element name="hbx_id" type="IdentifierType"/>
+								<xs:element name="npn" type="NpnIdType">
+									<xs:annotation>
+										<xs:documentation>Broker National Producer Number (NPN) identifier</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Broker or organization name in free-form text</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="tpa_ga_fein" type="FederalTaxIdType" minOccurs="0"/>
+								<xs:element name="tpa_name" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>TPA or organization name in free-form text</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 			<xs:element ref="open_enrollment_start"/>
 			<xs:element ref="open_enrollment_end"/>
 			<xs:element ref="plan_year_start"/>
 			<xs:element ref="plan_year_end" minOccurs="0"/>
-			<xs:element name="plans" minOccurs="0">
+			<xs:element name="plans">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="plan" type="EmployerPlanListType" maxOccurs="unbounded"/>
+						<xs:element name="plan" type="EmployerPlanListType" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -110,6 +123,7 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="version" type="xs:integer" minOccurs="0"/>
 			<xs:element name="notes" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -381,16 +395,6 @@
 										<xs:documentation>Indicate success or failure of a request to a service</xs:documentation>
 									</xs:annotation>
 								</xs:element>
-								<xs:element name="originating_service" type="xs:anyURI" minOccurs="0">
-									<xs:annotation>
-										<xs:documentation>The urn of the requesting service</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="reply_to" type="xs:anyURI" minOccurs="0">
-									<xs:annotation>
-										<xs:documentation>Designates the consumer service urn endpoint where to transmit response</xs:documentation>
-									</xs:annotation>
-								</xs:element>
 								<xs:element name="correlation_id" type="xs:string" minOccurs="0">
 									<xs:annotation>
 										<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
@@ -431,18 +435,32 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:complexType name="EmployerLinkType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="hbx_id" type="IdentifierType"/>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="dba" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
 	<xs:complexType name="EmployerIndexType">
 		<xs:annotation>
 			<xs:documentation>Summary-level emplioyer attributes</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="hbx_id" type="IdentifierType"/>
 			<xs:element name="name" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Employer name in free-form text</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="dba">
+				<xs:annotation>
+					<xs:documentation>Doing Business As</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="fein"/>
-			<xs:group ref="HbxIdentifierGroup"/>
 			<xs:element ref="sic_code" minOccurs="0"/>
 			<xs:element ref="fte_count"/>
 			<xs:element ref="pte_count"/>
@@ -452,20 +470,29 @@
 			<xs:element ref="plan_year_end" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:complexType name="EmployerEmployeeSubscriberType">
+		<xs:complexContent>
+			<xs:restriction base="IndividualType">
+				<xs:sequence>
+					<xs:element name="id" type="IdentifierType"/>
+					<xs:element name="person" type="PersonType"/>
+					<xs:element name="relationships" type="IndividualRelationshipType"/>
+					<xs:element name="hbx_roles" type="IndividualFacetType" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
 	<xs:complexType name="EmployerEmployeeType">
 		<xs:annotation>
 			<xs:documentation>Employee instance attributes</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element ref="employer"/>
-			<xs:element name="employee" type="PersonType"/>
-			<xs:element name="member_roles">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="member_role" type="QhpRoleType" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="hbx_id" type="IdentifierType"/>
+			<xs:element name="links"/>
+			<xs:element name="employer" type="EmployerLinkType"/>
+			<xs:element name="employee" type="EmployerEmployeeSubscriberType"/>
+			<xs:element name="dependents" type="EmployerEmployeeDependentsType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EmployerEmployeeRequestType">
@@ -685,16 +712,6 @@
 										<xs:documentation>Indicate success or failure of a request to a service</xs:documentation>
 									</xs:annotation>
 								</xs:element>
-								<xs:element name="originating_service" type="xs:anyURI" minOccurs="0">
-									<xs:annotation>
-										<xs:documentation>The urn of the requesting service</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="reply_to" type="xs:anyURI" minOccurs="0">
-									<xs:annotation>
-										<xs:documentation>Designates the consumer service urn endpoint where to transmit response</xs:documentation>
-									</xs:annotation>
-								</xs:element>
 								<xs:element name="correlation_id" type="xs:string" minOccurs="0">
 									<xs:annotation>
 										<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
@@ -735,12 +752,12 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:element name="employer" type="EmployerType">
+	<xs:element name="employer" type="EmployerLinkType">
 		<xs:annotation>
 			<xs:documentation>SHOP employer instance</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="employer_uri" type="xs:anyURI" substitutionGroup="resource_instance_uri">
+	<xs:element name="employer_uri" type="IdentifierType" substitutionGroup="resource_instance_uri">
 		<xs:annotation>
 			<xs:documentation>Dereferenceable identifier for employer instance, e.g. http://dchealthlink.com/api/services/employer/_id</xs:documentation>
 		</xs:annotation>
@@ -787,7 +804,6 @@
 			<xs:documentation>Number of part-time employees</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="broker" type="EmployerBrokerType"/>
 	<xs:element name="fein" type="FederalTaxIdType">
 		<xs:annotation>
 			<xs:documentation>Federal Employer Identification Number</xs:documentation>
@@ -813,4 +829,9 @@
 			<xs:documentation>Date employer plan eligibility ends</xs:documentation>
 		</xs:annotation>
 	</xs:element>
+	<xs:complexType name="EmployerEmployeeDependentsType">
+		<xs:sequence>
+			<xs:element name="dependent" type="IndividualType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
 </xs:schema>

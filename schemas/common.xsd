@@ -6,6 +6,7 @@
 			<xs:documentation>Name and contact information for an individual</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
 			<xs:element name="name" type="NameType"/>
 			<xs:element name="job_title" type="xs:string" minOccurs="0"/>
 			<xs:element name="department" type="xs:string" minOccurs="0"/>
@@ -30,16 +31,6 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="authority_hbx_id" type="xs:string" minOccurs="0"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="PersonListType">
-		<xs:annotation>
-			<xs:documentation>Summary attributes for a person</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="name" type="NameType"/>
-			<xs:group ref="HbxIdentifierGroup"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="NameType">
@@ -98,7 +89,11 @@
 			</xs:element>
 			<xs:element name="phone_number" type="TelephoneNumberType"/>
 			<xs:element name="extension" type="xs:string" minOccurs="0"/>
-			<xs:element name="preferred" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="preferred" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag indicating preferred contact number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EmailType">
@@ -137,34 +132,21 @@
 			<xs:element name="end" type="SimpleDateType"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="KeyValuePairType">
-		<xs:annotation>
-			<xs:documentation>Data structure that includes a label and associated attribute value</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="key" type="xs:string"/>
-			<xs:element name="value" type="xs:anyType"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="HashType">
-		<xs:annotation>
-			<xs:documentation>An array of one or more KeyValueType pairs</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="key_value_pair" type="KeyValuePairType" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
 	<xs:group name="HbxIdentifierGroup">
 		<xs:annotation>
-			<xs:documentation>Identifier pair for a single Exchange resource in both enterprise URI and local service form</xs:documentation>
+			<xs:documentation>Identifier pair for a Enterprise/globally unique resource</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="hbx_assigned_uri" type="xs:anyURI">
+			<xs:element name="hbx_id" type="xs:anyURI">
 				<xs:annotation>
-					<xs:documentation>Enterprise/globally unique identifier for this resource</xs:documentation>
+					<xs:documentation>CMS-assigned Exchange ID</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="hbx_assigned_id" type="xs:string" minOccurs="0"/>
+			<xs:element name="id" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Exchange-assigned ID for this resource</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:group>
 	<xs:group name="ServiceEndpointGroup">
@@ -423,33 +405,11 @@
 			<xs:element name="body" type="xs:anyType"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="EnrollmentStatusType">
-		<xs:annotation>
-			<xs:documentation>An Application Group's enrollment status at a given period of time</xs:documentation>
-		</xs:annotation>
+	<xs:complexType name="DatePeriodType">
 		<xs:sequence>
-			<xs:element name="event_id">
-				<xs:annotation>
-					<xs:documentation>Dereferenceable event identifier that triggered enrollment state</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="state">
-				<xs:annotation>
-					<xs:documentation>Status of enrollment</xs:documentation>
-				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:anyURI">
-						<xs:enumeration value="urn:dc0:terms:enrollment_state#open"/>
-						<xs:enumeration value="urn:dc0:terms:enrollment_state#closed"/>
-						<xs:enumeration value="urn:dc0:terms:enrollment_state#special_enrollment_period"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-			<xs:element name="time_period">
-				<xs:annotation>
-					<xs:documentation>Enrollment state start and end dates</xs:documentation>
-				</xs:annotation>
-			</xs:element>
+			<xs:element name="begin_date" type="xs:date"/>
+			<xs:element name="end_date" type="xs:date" minOccurs="0"/>
+			<xs:element name="number_of_days" type="xs:integer" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="ServiceEndPointType">
@@ -471,6 +431,21 @@
 			<xs:group ref="ServiceEndpointGroup"/>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:simpleType name="IdentifierType">
+		<xs:annotation>
+			<xs:documentation>Base type for unique, dereferenceable instance identifiers </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI"/>
+	</xs:simpleType>
+	<xs:simpleType name="CalendarYearType">
+		<xs:annotation>
+			<xs:documentation>Year represented in four-digit format: CCYY.  For example: 2015</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="2013"/>
+			<xs:maxInclusive value="2020"/>
+		</xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="HbxIdNameType">
 		<xs:annotation>
 			<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
@@ -650,20 +625,40 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:marital_status#unknown"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:complexType name="InterpersonalRelationshipType">
+	<xs:complexType name="ApprovalType">
+		<xs:sequence>
+			<xs:element name="status">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#pending"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#approved"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#denied"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="determined_by" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Individual, Representative or agent who adjudicated approval</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="determination_date" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="notes" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonRelationshipType">
 		<xs:annotation>
-			<xs:documentation>Interpersonal relationship state between two indiciduals</xs:documentation>
+			<xs:documentation>Interpersonal relationship state between two individuals</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="subject_individual" type="xs:anyURI"/>
 			<xs:element name="relationship_uri" type="xs:anyURI"/>
-			<xs:element name="inverse_relationship_uri" minOccurs="0" type="xs:anyURI"/>
+			<xs:element name="inverse_relationship_uri" type="xs:anyURI" minOccurs="0"/>
 			<xs:element name="object_individual" type="xs:anyURI"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:element name="relationship_uri" type="xs:anyURI" abstract="true"/>
 	<xs:element name="inverse_relationship_uri" type="xs:anyURI"/>
-	<xs:simpleType name="IndividualRelationshipNameType">
+	<xs:simpleType name="PeopleRelationshipNameType">
 		<xs:annotation>
 			<xs:documentation>Interpersonal relationship names between connected individuals</xs:documentation>
 		</xs:annotation>
@@ -846,6 +841,20 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#application_submitted"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#maintenance_pending"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:enrollment_status#maintenance_submitted"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HbxMarketNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_market#individual"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_market#shop"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NpnIdType">
+		<xs:annotation>
+			<xs:documentation>Broker National Producer Number (NPN) identifier</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

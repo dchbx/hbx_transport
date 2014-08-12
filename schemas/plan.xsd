@@ -17,16 +17,9 @@
 		<xs:sequence>
 			<xs:element name="id" type="xs:string"/>
 			<xs:element name="name" type="xs:string"/>
-			<xs:element name="is_dental_only" type="xs:boolean"/>
-			<xs:element name="issuer" type="IssuerType"/>
-			<xs:element name="market">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="individual"/>
-						<xs:enumeration value="shop"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
+			<xs:element name="is_dental_only_flag" type="xs:boolean"/>
+			<xs:element name="issuer" type="IssuerLinkType"/>
+			<xs:element name="market" type="HbxMarketNameType"/>
 			<xs:element name="coverages" type="CoverageType" maxOccurs="unbounded"/>
 			<xs:element name="cost_structure" type="CostStructureType"/>
 			<xs:element name="maximums">
@@ -37,14 +30,14 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="deductables" type="DeductableType"/>
-			<xs:element name="metadata" type="MetadataType"/>
+			<xs:element name="metadata" type="xs:string"/>
 			<xs:element name="rates" type="RateType"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="RateType">
 		<xs:sequence>
 			<xs:element name="age"/>
-			<xs:element name="effective_date"/>
+			<xs:element name="effective_date" type="SimpleDateType"/>
 			<xs:element name="expire_date" type="SimpleDateType"/>
 			<xs:element name="rate" type="CurrencyType"/>
 			<xs:element name="rating_area"/>
@@ -153,14 +146,7 @@
 			<xs:element name="wellness_program_offered" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="IssuerType">
-		<xs:sequence>
-			<xs:element name="name"/>
-			<xs:group ref="HbxIdentifierGroup"/>
-			<xs:element name="fein" type="FederalTaxIdType"/>
-			<xs:element name="issuer_state" default='"DC"'/>
-		</xs:sequence>
-	</xs:complexType>
+	
 	<xs:complexType name="CoverageCostType">
 		<xs:sequence>
 			<xs:element name="coinsurance" type="CostByNetworkType"/>
@@ -191,19 +177,13 @@
 	<xs:complexType name="Deductables"/>
 	<xs:complexType name="PlanReferenceType">
 		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="hbx_id" type="IdentifierType"/>
 			<xs:element name="hios_plan_id" type="xs:string"/>
-			<xs:element name="coverage_type">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="health"/>
-						<xs:enumeration value="dental"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-			<xs:group ref="HbxIdentifierGroup"/>
+			<xs:element name="coverage_type" type="BenefitCoverageNameType"/>
 			<xs:element name="csr" type="xs:float"/>
 			<xs:element name="ehb" type="xs:float"/>
-			<xs:element name="carrier" type="CarrierReferenceType"/>
+			<xs:element name="issuer" type="IssuerLinkType"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
