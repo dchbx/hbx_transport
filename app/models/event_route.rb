@@ -6,6 +6,6 @@ class EventRoute
     if "default" == self.exchange_kind.to_s.downcase
       return channel.default_exchange
     end
-    channel.send(*[self.exchange_kind.to_s, self.exchange_name])
+    channel.send(*[self.exchange_kind.to_s, self.exchange_name.to_s])
   end
 end
