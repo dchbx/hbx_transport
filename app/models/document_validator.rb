@@ -1,6 +1,10 @@
 class DocumentValidator
   include ActiveModel::Validations
 
+  XML_NS = {
+    "cv" => "http://openhbx.org/api/terms/1.0"
+  }
+
   validate :check_against_schema
 
   attr_reader :document, :schema
